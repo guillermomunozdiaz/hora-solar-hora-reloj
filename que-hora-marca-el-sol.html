@@ -1,0 +1,486 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Compara en directo la hora oficial con la hora solar en diez ciudades españolas: amaneceres, atardeceres y cuánto va adelantado el reloj.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="¿Qué hora marca el sol?">
+<meta property="og:description" content="Compara en directo la hora oficial con la hora solar en diez ciudades españolas: amaneceres, atardeceres y cuánto va adelantado el reloj.">
+<meta name="theme-color" content="#EDF0F5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0C1220" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='7.5' fill='%23EFA300'/%3E%3Cpath d='M16 2v4M16 26v4M2 16h4M26 16h4M6.1 6.1l2.8 2.8M23.1 23.1l2.8 2.8M6.1 25.9l2.8-2.8M23.1 8.9l2.8-2.8' stroke='%23EFA300' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<title>¿Qué hora marca el sol?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,100..900&family=Newsreader:ital,opsz,wght@0,6..72,400..600;1,6..72,400..600&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+/* Una columna de lectura (máx. 46rem): la lectura en vivo arriba; después el día, el año, las ciudades y el porqué. */
+:root{
+  --bg:#EDF0F5;--surface:#F8F9FC;--ink:#141B2E;--muted:#596378;--line:#CBD2DE;
+  --clock:#2C4BA3;--sun:#EFA300;--sun-ink:#8F5500;
+  --night:#24325A;--twilight:#7C93CB;--day:#FFDF94;--day-fill:#FFDC85;--tw-fill:#CDD6EE;--now:#FFFFFF;
+  --display:"Archivo","Arial Narrow","Helvetica Neue",Arial,sans-serif;
+  --text:"Newsreader",Georgia,"Times New Roman",serif;
+  --fs-label:.72rem;--fs-s:.92rem;--fs-m:1.0625rem;--fs-l:1.3rem;--fs-xl:clamp(2rem,7vw,2.9rem);--fs-num:clamp(2.6rem,14vw,6rem);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0C1220;--surface:#131B2E;--ink:#E6EBF4;--muted:#96A1B7;--line:#27324B;
+  --clock:#91AAF3;--sun:#FFB51A;--sun-ink:#FFC650;
+  --night:#070B15;--twilight:#2D3E6C;--day:#8E6D1E;--day-fill:#5E4914;--tw-fill:#212C49;--now:#FFFFFF;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1220;--surface:#131B2E;--ink:#E6EBF4;--muted:#96A1B7;--line:#27324B;
+  --clock:#91AAF3;--sun:#FFB51A;--sun-ink:#FFC650;
+  --night:#070B15;--twilight:#2D3E6C;--day:#8E6D1E;--day-fill:#5E4914;--tw-fill:#212C49;--now:#FFFFFF;color-scheme:dark}
+*,*::before,*::after{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--text);font-size:var(--fs-m);line-height:1.55}
+.page{max-width:46rem;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:2.25rem 3.5rem;display:grid;gap:3.25rem}
+h1,h2,p{margin:0}
+h1,h2{font-family:var(--display);text-wrap:balance;color:var(--ink)}
+h1{font-size:var(--fs-xl);font-weight:800;font-stretch:85%;line-height:1;letter-spacing:-.015em}
+h2{font-size:var(--fs-l);font-weight:700;font-stretch:90%;line-height:1.15}
+.eyebrow,.label,dt,thead th{font-family:var(--display);font-size:var(--fs-label);font-weight:600;text-transform:uppercase;letter-spacing:.09em;color:var(--muted)}
+.hero{display:grid;gap:1.1rem}
+.lede,.sec-head p{color:var(--muted);max-width:36rem}
+.sec-head p{font-size:var(--fs-s)}
+button:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--clock);outline-offset:2px}
+.readout{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:1rem 1.1rem 1.1rem}
+.r-col{display:grid;gap:.3rem;align-content:start;min-width:0}
+.r-col+.r-col{border-left:1px solid var(--line);padding-left:1rem}
+.big{font-family:var(--display);font-size:var(--fs-num);font-weight:800;font-stretch:72%;line-height:.92;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--clock)}
+.r-col.sun .big{color:var(--sun-ink)}
+.sub{font-family:var(--display);font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.verdict{grid-column:1/-1;margin-top:1rem;padding-top:.85rem;border-top:1px solid var(--line);font-size:var(--fs-l);line-height:1.3}
+.verdict strong{font-family:var(--display);font-weight:800;font-stretch:85%}
+.cities{display:flex;flex-wrap:wrap;gap:.4rem}
+.chip{font-family:var(--display);font-size:.85rem;font-weight:600;padding:.4rem .75rem;min-height:2.25rem;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer}
+.chip:hover{border-color:var(--muted)}
+.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.sec{display:grid;gap:1rem}
+.sec-head{display:grid;gap:.35rem}
+.sec-head.row{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:.75rem 1rem}
+.sec-head.row>div:first-child{display:grid;gap:.35rem;flex:1 1 18rem;min-width:0}
+.daybar{display:grid;gap:.3rem}
+.ruler{position:relative;height:1.1rem;font-family:var(--display);font-size:.72rem;font-variant-numeric:tabular-nums}
+.ruler span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
+.ruler span.l{transform:none}
+.ruler span.r{transform:translateX(-100%)}
+.ruler.top span{color:var(--clock)}
+.ruler.bottom span{color:var(--sun-ink)}
+.ruler span.k{font-weight:800}
+.bar{position:relative;height:3.25rem;border-radius:8px;border:1px solid var(--line);background:var(--night);overflow:hidden}
+.bar .mid{position:absolute;top:0;bottom:0;left:50%;width:2px;margin-left:-1px;background:var(--clock)}
+.bar .noon{position:absolute;top:50%;left:54%;width:1.1rem;height:1.1rem;margin:-.55rem 0 0 -.55rem;border-radius:50%;background:var(--sun);box-shadow:0 0 0 4px color-mix(in srgb,var(--sun) 30%,transparent)}
+.bar .now{position:absolute;top:0;bottom:0;left:70%;width:2px;margin-left:-1px;background:var(--now);box-shadow:0 0 0 1px rgba(10,14,28,.55)}
+.legend{display:flex;flex-wrap:wrap;gap:.4rem 1.1rem;font-family:var(--display);font-size:.78rem;color:var(--muted)}
+.legend span{display:inline-flex;align-items:center;gap:.4rem}
+.sw{display:inline-block;flex:none}
+.sw.mid{width:2px;height:.9rem;background:var(--clock)}
+.sw.noon{width:.7rem;height:.7rem;border-radius:50%;background:var(--sun)}
+.sw.now{width:2px;height:.9rem;background:var(--now);box-shadow:0 0 0 1px rgba(10,14,28,.55)}
+.sw.edge{width:1rem;height:2px;background:var(--sun)}
+.sw.dash{width:1rem;height:0;border-top:2px dashed var(--sun-ink)}
+.sw.tw{width:.8rem;height:.8rem;border-radius:2px;background:var(--tw-fill)}
+.facts{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:.75rem 1rem;margin:0}
+.facts div{display:grid;gap:.15rem;min-width:0}
+.facts dd{margin:0;font-family:var(--display);font-size:1.6rem;font-weight:700;font-stretch:78%;line-height:1.1;font-variant-numeric:tabular-nums}
+@media (max-width:540px){.facts{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.seg{display:inline-flex;gap:2px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface);flex:none}
+.seg button{font-family:var(--display);font-size:.85rem;font-weight:600;min-height:2.1rem;padding:.35rem .95rem;border:0;border-radius:999px;background:transparent;color:var(--muted);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.chart{width:100%;min-width:0}
+.chart svg{display:block;width:100%;height:auto;touch-action:pan-y;cursor:crosshair}
+.c-grid{stroke:var(--line);stroke-width:1;fill:none}
+.c-month{stroke-dasharray:2 4}
+.c-axis{fill:var(--muted);font-family:var(--display);font-size:11px;font-weight:500;font-variant-numeric:tabular-nums}
+.c-axis.k{fill:var(--clock);font-weight:700}
+.c-tw{fill:var(--tw-fill)}
+.c-day{fill:var(--day-fill)}
+.c-edge{fill:none;stroke:var(--sun);stroke-width:1.75;stroke-linejoin:round}
+.c-noon{fill:none;stroke:var(--sun-ink);stroke-width:1.4;stroke-dasharray:5 4}
+.c-twelve{fill:none;stroke:var(--clock);stroke-width:1.4}
+.c-today{fill:none;stroke:var(--ink);stroke-width:1.2}
+.c-today-t{fill:var(--ink);font-weight:700}
+.c-hover{fill:none;stroke:var(--ink);stroke-width:1;stroke-dasharray:2 3}
+.c-dot{fill:var(--surface);stroke:var(--ink);stroke-width:1.5}
+.chart-read{font-family:var(--display);font-size:.9rem;font-variant-numeric:tabular-nums;min-height:2.6em}
+.table-wrap{overflow-x:auto;min-width:0}
+table{width:100%;min-width:21rem;border-collapse:collapse;font-family:var(--display);font-size:.9rem;font-variant-numeric:tabular-nums}
+th,td{padding:.6rem .4rem;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap;vertical-align:middle}
+th:first-child,td:first-child{text-align:left;padding-left:0}
+th:last-child,td:last-child{padding-right:0}
+thead th{font-size:.64rem;white-space:normal;vertical-align:bottom;line-height:1.25}
+tbody th{font-weight:600}
+tbody td{color:var(--muted)}
+tbody th button{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;text-align:left;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}
+tbody th small{display:block;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
+tbody tr.sel th button{color:var(--clock);text-decoration-color:currentColor}
+tbody tr.sel td{color:var(--ink);font-weight:700}
+.lag{display:inline-grid;justify-items:end;gap:4px;width:5.2rem}
+.lag i{display:block;height:4px;border-radius:2px;background:var(--sun)}
+.lag b{font-weight:inherit}
+.why{display:grid;gap:.9rem}
+.why p{max-width:37rem}
+.why strong{font-family:var(--display);font-weight:700;font-stretch:88%;color:var(--sun-ink)}
+.note{font-family:var(--display);font-size:.78rem;color:var(--muted);max-width:37rem;line-height:1.5;padding-top:1rem;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+<main class="page">
+  <header class="hero">
+    <p class="eyebrow" id="today-label">Lunes, 2 de noviembre</p>
+    <h1>¿Qué hora marca el sol?</h1>
+    <p class="lede">España vive con el reloj por delante del sol. Esto es lo que marca cada uno ahora mismo.</p>
+    <div class="readout">
+      <div class="r-col"><span class="label">Hora oficial</span><span class="big" id="clock-now">17:00</span><span class="sub" id="clock-sub">UTC+1</span></div>
+      <div class="r-col sun"><span class="label">Hora del sol</span><span class="big" id="sun-now">16:02</span><span class="sub" id="sun-sub">Longitud 3,70° O</span></div>
+      <p class="verdict" id="verdict" aria-live="polite">En Madrid, el reloj va <strong>58 min</strong> por delante del sol.</p>
+    </div>
+    <div class="cities" id="cities" role="group" aria-label="Ciudad"></div>
+  </header>
+
+  <section class="sec" aria-labelledby="h-day">
+    <div class="sec-head">
+      <h2 id="h-day">Hoy, de medianoche a medianoche</h2>
+      <p>Arriba, la hora oficial. Abajo, la hora solar, que marca las 12:00 cuando el sol está en lo más alto.</p>
+    </div>
+    <div class="daybar">
+      <div class="ruler top" id="ruler-clock" aria-hidden="true"></div>
+      <div class="bar" id="bar" role="img" aria-label="Franja del día con noche, crepúsculo y horas de luz"><span class="mid"></span><span class="noon" id="bar-noon"></span><span class="now" id="bar-now"></span></div>
+      <div class="ruler bottom" id="ruler-sun" aria-hidden="true"></div>
+    </div>
+    <p class="legend"><span><i class="sw mid"></i>12:00 del reloj</span><span><i class="sw noon"></i>Mediodía solar</span><span><i class="sw now"></i>Ahora</span></p>
+    <dl class="facts">
+      <div><dt>Amanece</dt><dd id="f-rise">07:46</dd></div>
+      <div><dt>Mediodía solar</dt><dd id="f-noon">12:58</dd></div>
+      <div><dt>Anochece</dt><dd id="f-set">18:12</dd></div>
+      <div><dt>Horas de luz</dt><dd id="f-len">10 h 26 min</dd></div>
+    </dl>
+  </section>
+
+  <section class="sec" aria-labelledby="h-year">
+    <div class="sec-head row">
+      <div><h2 id="h-year">El año entero</h2><p id="year-sub">Salida y puesta del sol en Madrid, con la hora oficial.</p></div>
+      <div class="seg" role="group" aria-label="Escala de tiempo"><button type="button" id="m-clock" aria-pressed="true">Reloj</button><button type="button" id="m-sun" aria-pressed="false">Sol</button></div>
+    </div>
+    <div class="chart" id="chart"></div>
+    <p class="chart-read" id="chart-read" aria-live="polite"></p>
+    <p class="legend"><span><i class="sw edge"></i>Salida y puesta</span><span><i class="sw dash"></i>Mediodía solar</span><span><i class="sw mid"></i>12:00</span><span><i class="sw tw"></i>Crepúsculo civil</span></p>
+  </section>
+
+  <section class="sec" aria-labelledby="h-cities">
+    <div class="sec-head">
+      <h2 id="h-cities">De oeste a este</h2>
+      <p>Hoy, en diez ciudades. En la península, cuanto más al oeste, más tarde sale y se pone el sol.</p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th scope="col">Ciudad</th><th scope="col">Amanece</th><th scope="col">Mediodía solar</th><th scope="col">Anochece</th><th scope="col">Reloj adelantado</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="why" aria-labelledby="h-why">
+    <h2 id="h-why">Por qué va adelantado</h2>
+    <p>Casi toda la España peninsular queda al oeste del meridiano de Greenwich, como Portugal y el Reino Unido, que usan UTC+0. España, en cambio, usa desde 1940 la hora de Europa central, UTC+1. Por eso, en invierno, el sol de Madrid llega a lo más alto entre la una y la una y media.</p>
+    <p>En verano el reloj se adelanta otra hora más. A finales de julio, en A Coruña, el mediodía solar llega pasadas las dos y media de la tarde.</p>
+    <p>Canarias va una hora por detrás de la península, pero también por delante de su sol: Las Palmas está a más de 15° al oeste de Greenwich, la longitud que correspondería a UTC−1.</p>
+    <p>El sol tampoco es del todo puntual. Por la inclinación del eje de la Tierra y su órbita elíptica, el mediodía solar se adelanta o se retrasa a lo largo del año: hasta unos 16 minutos a principios de noviembre y unos 14 a mediados de febrero. Es la ecuación del tiempo. Hoy el sol <strong id="eot-today">adelanta 16 min 24 s</strong> sobre su hora media.</p>
+    <p>La hora oficial de España la mantiene el Real Instituto y Observatorio de la Armada, en San Fernando (Cádiz).</p>
+  </section>
+
+  <footer class="note">Cálculo hecho en tu navegador con las fórmulas solares de la NOAA, con un margen de un minuto. Amanecer y anochecer se refieren al borde superior del sol con la refracción atmosférica; el crepúsculo civil acaba con el sol 6° bajo el horizonte. La hora oficial de cada ciudad sigue las reglas de zona horaria de tu navegador.</footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const rad = Math.PI / 180, deg = 180 / Math.PI;
+  const CITIES = [
+    { id: 'laspalmas', name: 'Las Palmas', lat: 28.1235, lon: -15.4363, tz: 'Atlantic/Canary' },
+    { id: 'coruna', name: 'A Coruña', lat: 43.3623, lon: -8.4115, tz: 'Europe/Madrid' },
+    { id: 'sevilla', name: 'Sevilla', lat: 37.3891, lon: -5.9845, tz: 'Europe/Madrid' },
+    { id: 'oviedo', name: 'Oviedo', lat: 43.3614, lon: -5.8494, tz: 'Europe/Madrid' },
+    { id: 'madrid', name: 'Madrid', lat: 40.4168, lon: -3.7038, tz: 'Europe/Madrid' },
+    { id: 'bilbao', name: 'Bilbao', lat: 43.2630, lon: -2.9350, tz: 'Europe/Madrid' },
+    { id: 'zaragoza', name: 'Zaragoza', lat: 41.6488, lon: -0.8891, tz: 'Europe/Madrid' },
+    { id: 'valencia', name: 'Valencia', lat: 39.4699, lon: -0.3763, tz: 'Europe/Madrid' },
+    { id: 'barcelona', name: 'Barcelona', lat: 41.3874, lon: 2.1686, tz: 'Europe/Madrid' },
+    { id: 'palma', name: 'Palma', lat: 39.5696, lon: 2.6502, tz: 'Europe/Madrid' }
+  ];
+  const MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  const MON3 = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const DAYS = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const KEYS = ['dawn','rise','noon','set','dusk'];
+  const pad = n => String(n).padStart(2, '0');
+  const wrap = m => ((m % 1440) + 1440) % 1440;
+  const hm = m => { const t = wrap(Math.round(m)); return pad(Math.floor(t / 60)) + ':' + pad(t % 60); };
+  const dur = m => { m = Math.round(Math.abs(m)); const h = Math.floor(m / 60), r = m % 60; return h ? (r ? h + ' h ' + r + ' min' : h + ' h') : r + ' min'; };
+  const reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+  // Posición del sol (fórmulas de la NOAA). Devuelve minutos UTC del día.
+  function sunDay(ms, lat, lon) {
+    const T = (ms / 86400000 + 2440587.5 - 2451545) / 36525;
+    const L0 = (((280.46646 + T * (36000.76983 + T * 0.0003032)) % 360) + 360) % 360;
+    const M = (357.52911 + T * (35999.05029 - 0.0001537 * T)) * rad;
+    const e = 0.016708634 - T * (0.000042037 + 0.0000001267 * T);
+    const C = Math.sin(M) * (1.914602 - T * (0.004817 + 0.000014 * T)) + Math.sin(2 * M) * (0.019993 - 0.000101 * T) + Math.sin(3 * M) * 0.000289;
+    const om = (125.04 - 1934.136 * T) * rad;
+    const lam = (L0 + C - 0.00569 - 0.00478 * Math.sin(om)) * rad;
+    const eps0 = 23 + (26 + (21.448 - T * (46.815 + T * (0.00059 - T * 0.001813))) / 60) / 60;
+    const eps = (eps0 + 0.00256 * Math.cos(om)) * rad;
+    const decl = Math.asin(Math.sin(eps) * Math.sin(lam));
+    const y = Math.pow(Math.tan(eps / 2), 2), L = L0 * rad;
+    const eot = 4 * deg * (y * Math.sin(2 * L) - 2 * e * Math.sin(M) + 4 * e * y * Math.sin(M) * Math.cos(2 * L) - 0.5 * y * y * Math.sin(4 * L) - 1.25 * e * e * Math.sin(2 * M));
+    const ha = z => { const c = (Math.cos(z * rad) - Math.sin(lat * rad) * Math.sin(decl)) / (Math.cos(lat * rad) * Math.cos(decl)); return Math.acos(Math.max(-1, Math.min(1, c))) * deg * 4; };
+    const noon = 720 - 4 * lon - eot, h = ha(90.833), hc = ha(96);
+    return { eot, noon, rise: noon - h, set: noon + h, dawn: noon - hc, dusk: noon + hc };
+  }
+
+  const fmts = {};
+  function parts(ms, tz) {
+    const f = fmts[tz] || (fmts[tz] = new Intl.DateTimeFormat('en-US', { timeZone: tz, hourCycle: 'h23', year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric', second: 'numeric' }));
+    const o = {};
+    f.formatToParts(new Date(ms)).forEach(p => { o[p.type] = p.value; });
+    return { y: +o.year, mo: +o.month, d: +o.day, h: (+o.hour) % 24, mi: +o.minute, s: +o.second };
+  }
+  function offsetMin(ms, tz) {
+    const t = Math.floor(ms / 1000) * 1000, p = parts(t, tz);
+    return Math.round((Date.UTC(p.y, p.mo - 1, p.d, p.h, p.mi, p.s) - t) / 60000);
+  }
+  function todayInfo(c) {
+    const p = parts(Date.now(), c.tz), ms = Date.UTC(p.y, p.mo - 1, p.d, 12);
+    const s = sunDay(ms, c.lat, c.lon), off = offsetMin(ms, c.tz);
+    return { p, s, off, lag: off - 4 * c.lon - s.eot };
+  }
+
+  let city = CITIES[4], mode = 'clock';
+  try {
+    const sc = CITIES.find(c => c.id === localStorage.getItem('qhms-city')); if (sc) city = sc;
+    const sm = localStorage.getItem('qhms-mode'); if (sm === 'clock' || sm === 'sun') mode = sm;
+  } catch (e) {}
+
+  let Y = null, shown = null, dims = null, hover = null, todayIdx = 0, anim = 0, lastW = 0, lastDay = null;
+  const clone = o => { const r = {}; KEYS.forEach(k => { r[k] = o[k].slice(); }); return r; };
+
+  function updateNow() {
+    const ms = Date.now(), p = parts(ms, city.tz);
+    const key = p.y + '-' + p.mo + '-' + p.d;
+    if (lastDay && key !== lastDay) { lastDay = key; selectCity(city.id); return; }
+    lastDay = key;
+    const s = sunDay(ms, city.lat, city.lon), off = offsetMin(ms, city.tz);
+    const lag = Math.round(off - 4 * city.lon - s.eot), clock = p.h * 60 + p.mi;
+    $('clock-now').textContent = hm(clock);
+    $('sun-now').textContent = hm(clock - lag);
+    $('clock-sub').textContent = 'UTC' + (off >= 0 ? '+' : '−') + Math.abs(off) / 60;
+    $('sun-sub').textContent = 'Longitud ' + Math.abs(city.lon).toFixed(2).replace('.', ',') + '° ' + (city.lon < 0 ? 'O' : 'E');
+    const v = lag === 0 ? 'En ' + city.name + ', el reloj y el sol van a la par.' : 'En ' + city.name + ', el reloj va <strong>' + dur(lag) + '</strong> ' + (lag > 0 ? 'por delante' : 'por detrás') + ' del sol.';
+    if ($('verdict').innerHTML !== v) $('verdict').innerHTML = v;
+    const wd = DAYS[new Date(Date.UTC(p.y, p.mo - 1, p.d)).getUTCDay()];
+    $('today-label').textContent = wd.charAt(0).toUpperCase() + wd.slice(1) + ', ' + p.d + ' de ' + MONTHS[p.mo - 1];
+    $('bar-now').style.left = (clock / 1440 * 100) + '%';
+  }
+
+  function renderDay() {
+    const t = todayInfo(city), s = t.s, off = t.off, L = Math.round(t.lag);
+    const P = m => Math.max(0, Math.min(100, m / 1440 * 100));
+    const dawn = P(s.dawn + off), rise = P(s.rise + off), set = P(s.set + off), dusk = P(s.dusk + off);
+    const f = n => n.toFixed(2) + '%';
+    $('bar').style.background = 'linear-gradient(90deg, var(--night) 0%, var(--night) ' + f(dawn) + ', var(--twilight) ' + f(rise) + ', var(--day) ' + f(Math.min(rise + 2.5, 50)) + ', var(--day) ' + f(Math.max(set - 2.5, 50)) + ', var(--twilight) ' + f(set) + ', var(--night) ' + f(dusk) + ', var(--night) 100%)';
+    $('bar-noon').style.left = f(P(s.noon + off));
+    const tick = (h, pos) => { const pc = P(pos); const cls = (pc < 4 ? 'l' : pc > 96 ? 'r' : '') + (h === 12 ? ' k' : ''); return '<span class="' + cls + '" style="left:' + f(pc) + '">' + pad(h) + '</span>'; };
+    let top = '', bot = '';
+    for (let h = 0; h <= 24; h += 3) {
+      top += tick(h, h * 60);
+      const pos = h * 60 + L;
+      if (pos >= 0 && pos <= 1440) bot += tick(h, pos);
+    }
+    $('ruler-clock').innerHTML = top;
+    $('ruler-sun').innerHTML = bot;
+    $('f-rise').textContent = hm(s.rise + off);
+    $('f-noon').textContent = hm(s.noon + off);
+    $('f-set').textContent = hm(s.set + off);
+    $('f-len').textContent = dur(s.set - s.rise);
+  }
+
+  function computeYear() {
+    const p = parts(Date.now(), city.tz), yr = p.y, jan1 = Date.UTC(yr, 0, 1);
+    const n = Math.round((Date.UTC(yr + 1, 0, 1) - jan1) / 864e5);
+    const clock = {}, sun = {}, days = [];
+    KEYS.forEach(k => { clock[k] = []; sun[k] = []; });
+    let lo = Infinity, hi = -Infinity;
+    for (let d = 0; d < n; d++) {
+      const ms = Date.UTC(yr, 0, 1 + d, 12), s = sunDay(ms, city.lat, city.lon);
+      const off = offsetMin(ms, city.tz), sh = 4 * city.lon + s.eot;
+      lo = Math.min(lo, off); hi = Math.max(hi, off);
+      KEYS.forEach(k => { clock[k].push(s[k] + off); sun[k].push(s[k] + sh); });
+      days.push(ms);
+    }
+    todayIdx = Math.round((Date.UTC(p.y, p.mo - 1, p.d) - jan1) / 864e5);
+    return { yr, n, clock, sun, days, dst: hi !== lo };
+  }
+
+  function buildChart() {
+    if (!Y) return;
+    const box = $('chart');
+    const w = Math.max(280, Math.round(box.clientWidth || 340));
+    lastW = w;
+    const h = Math.round(Math.max(240, Math.min(340, w * 0.62)));
+    const m = { l: 40, r: 6, t: 16, b: 22 }, Y0 = 180, Y1 = 1395;
+    const x = i => m.l + i / (Y.n - 1) * (w - m.l - m.r);
+    const y = v => m.t + (Math.max(Y0, Math.min(Y1, v)) - Y0) / (Y1 - Y0) * (h - m.t - m.b);
+    dims = { w, h, m, x, y };
+    let g = '';
+    for (let hr = 4; hr <= 22; hr += 2) {
+      const yy = y(hr * 60).toFixed(1);
+      g += '<line class="c-grid" x1="' + m.l + '" x2="' + (w - m.r) + '" y1="' + yy + '" y2="' + yy + '"/>';
+      g += '<text class="c-axis' + (hr === 12 ? ' k' : '') + '" x="' + (m.l - 6) + '" y="' + yy + '" dy="0.35em" text-anchor="end">' + pad(hr) + ':00</text>';
+    }
+    const narrow = w < 520, jan1 = Date.UTC(Y.yr, 0, 1);
+    for (let mo = 0; mo < 12; mo++) {
+      const start = Math.round((Date.UTC(Y.yr, mo, 1) - jan1) / 864e5);
+      if (mo) { const xx = x(start).toFixed(1); g += '<line class="c-grid c-month" x1="' + xx + '" x2="' + xx + '" y1="' + m.t + '" y2="' + (h - m.b) + '"/>'; }
+      g += '<text class="c-axis" x="' + x(start + 14.5).toFixed(1) + '" y="' + (h - 6) + '" text-anchor="middle">' + (narrow ? MON3[mo].charAt(0).toUpperCase() : MON3[mo]) + '</text>';
+    }
+    const y12 = y(720).toFixed(1);
+    box.innerHTML = '<svg viewBox="0 0 ' + w + ' ' + h + '" width="' + w + '" height="' + h + '" role="img" tabindex="0" aria-label="Salida y puesta del sol a lo largo de ' + Y.yr + ' en ' + city.name + '">' +
+      '<path id="p-tw" class="c-tw"/><path id="p-day" class="c-day"/>' + g +
+      '<line class="c-twelve" x1="' + m.l + '" x2="' + (w - m.r) + '" y1="' + y12 + '" y2="' + y12 + '"/>' +
+      '<path id="p-rise" class="c-edge"/><path id="p-set" class="c-edge"/><path id="p-noon" class="c-noon"/>' +
+      '<line id="l-today" class="c-today" y1="' + m.t + '" y2="' + (h - m.b) + '"/>' +
+      '<text id="t-today" class="c-axis c-today-t" y="' + (m.t - 5) + '" text-anchor="middle">hoy</text>' +
+      '<line id="l-hover" class="c-hover" y1="' + m.t + '" y2="' + (h - m.b) + '" visibility="hidden"/>' +
+      '<circle id="d-rise" class="c-dot" r="3.5"/><circle id="d-set" class="c-dot" r="3.5"/></svg>';
+    drawPaths();
+  }
+
+  function drawPaths() {
+    if (!dims || !shown || !$('p-day')) return;
+    const x = dims.x, y = dims.y, S = shown, n = Y.n;
+    const fwd = a => { let s = ''; for (let i = 0; i < n; i++) s += (i ? 'L' : 'M') + x(i).toFixed(1) + ',' + y(a[i]).toFixed(1); return s; };
+    const back = a => { let s = ''; for (let i = n - 1; i >= 0; i--) s += 'L' + x(i).toFixed(1) + ',' + y(a[i]).toFixed(1); return s; };
+    $('p-tw').setAttribute('d', fwd(S.dawn) + back(S.dusk) + 'Z');
+    $('p-day').setAttribute('d', fwd(S.rise) + back(S.set) + 'Z');
+    $('p-rise').setAttribute('d', fwd(S.rise));
+    $('p-set').setAttribute('d', fwd(S.set));
+    $('p-noon').setAttribute('d', fwd(S.noon));
+    const tx = x(todayIdx).toFixed(1);
+    $('l-today').setAttribute('x1', tx); $('l-today').setAttribute('x2', tx); $('t-today').setAttribute('x', tx);
+    const i = hover == null ? todayIdx : hover, hx = x(i).toFixed(1), lh = $('l-hover');
+    lh.setAttribute('x1', hx); lh.setAttribute('x2', hx); lh.setAttribute('visibility', hover == null ? 'hidden' : 'visible');
+    $('d-rise').setAttribute('cx', hx); $('d-rise').setAttribute('cy', y(S.rise[i]).toFixed(1));
+    $('d-set').setAttribute('cx', hx); $('d-set').setAttribute('cy', y(S.set[i]).toFixed(1));
+  }
+
+  function tweenTo(target) {
+    cancelAnimationFrame(anim);
+    if (!shown || reduce || shown.rise.length !== target.rise.length) { shown = clone(target); drawPaths(); return; }
+    const from = clone(shown), t0 = performance.now(), D = 650;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / D), e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+      KEYS.forEach(key => { const a = from[key], b = target[key], s = shown[key]; for (let i = 0; i < s.length; i++) s[i] = a[i] + (b[i] - a[i]) * e; });
+      drawPaths();
+      if (k < 1) anim = requestAnimationFrame(step);
+    };
+    anim = requestAnimationFrame(step);
+  }
+
+  function setSub() {
+    $('year-sub').textContent = 'Salida y puesta del sol en ' + city.name + ' en ' + Y.yr + ', ' + (mode === 'clock'
+      ? 'con la hora oficial.' + (Y.dst ? ' Los escalones son los cambios de hora.' : '')
+      : 'con la hora solar: el día queda centrado en las 12:00.');
+  }
+  function updateRead() {
+    if (!Y) return;
+    const i = hover == null ? todayIdx : hover, T = Y[mode], d = new Date(Y.days[i]);
+    $('chart-read').textContent = d.getUTCDate() + ' ' + MON3[d.getUTCMonth()] + (i === todayIdx ? ' (hoy)' : '') +
+      ' · amanece ' + hm(T.rise[i]) + ' · anochece ' + hm(T.set[i]) + ' · ' + dur(T.set[i] - T.rise[i]) + ' de luz' +
+      (mode === 'clock' ? ' · mediodía solar ' + hm(T.noon[i]) : '');
+  }
+  function syncMode() {
+    $('m-clock').setAttribute('aria-pressed', String(mode === 'clock'));
+    $('m-sun').setAttribute('aria-pressed', String(mode === 'sun'));
+  }
+  function setMode(m) {
+    if (m === mode) return;
+    mode = m;
+    try { localStorage.setItem('qhms-mode', m); } catch (e) {}
+    syncMode(); setSub(); updateRead(); tweenTo(Y[mode]);
+  }
+
+  function renderTable() {
+    const rows = CITIES.map(c => { const t = todayInfo(c); return { c, rise: t.s.rise + t.off, noon: t.s.noon + t.off, set: t.s.set + t.off, lag: Math.round(t.lag) }; });
+    const max = Math.max(1, ...rows.map(r => r.lag));
+    $('tbody').innerHTML = rows.map(r => '<tr class="' + (r.c.id === city.id ? 'sel' : '') + '"><th scope="row"><button type="button" data-id="' + r.c.id + '" aria-pressed="' + (r.c.id === city.id) + '">' + r.c.name + '</button>' +
+      (r.c.tz === 'Atlantic/Canary' ? '<small>Hora canaria</small>' : '') + '</th><td>' + hm(r.rise) + '</td><td>' + hm(r.noon) + '</td><td>' + hm(r.set) + '</td>' +
+      '<td><span class="lag"><b>' + dur(r.lag) + '</b><i style="width:' + Math.max(4, r.lag / max * 100).toFixed(0) + '%"></i></span></td></tr>').join('');
+  }
+
+  function updateEot() {
+    const s = sunDay(Date.now(), city.lat, city.lon), secs = Math.round(Math.abs(s.eot) * 60);
+    $('eot-today').textContent = (s.eot >= 0 ? 'adelanta ' : 'atrasa ') + Math.floor(secs / 60) + ' min ' + pad(secs % 60) + ' s';
+  }
+
+  const chips = $('cities');
+  function selectCity(id) {
+    const c = CITIES.find(k => k.id === id); if (!c) return;
+    city = c;
+    try { localStorage.setItem('qhms-city', id); } catch (e) {}
+    chips.querySelectorAll('.chip').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.id === id)));
+    Y = computeYear(); hover = null;
+    if (!dims) buildChart();
+    const svg = $('chart').querySelector('svg');
+    if (svg) svg.setAttribute('aria-label', 'Salida y puesta del sol a lo largo de ' + Y.yr + ' en ' + city.name);
+    tweenTo(Y[mode]);
+    setSub(); updateRead(); renderDay(); renderTable(); updateNow(); updateEot();
+  }
+
+  chips.innerHTML = CITIES.map(c => '<button type="button" class="chip" data-id="' + c.id + '" aria-pressed="false">' + c.name + '</button>').join('');
+  chips.addEventListener('click', e => { const b = e.target.closest('button[data-id]'); if (b) selectCity(b.dataset.id); });
+  $('tbody').addEventListener('click', e => {
+    const b = e.target.closest('button[data-id]'); if (!b) return;
+    const id = b.dataset.id; selectCity(id);
+    const nb = $('tbody').querySelector('button[data-id="' + id + '"]'); if (nb) nb.focus({ preventScroll: true });
+  });
+  $('m-clock').addEventListener('click', () => setMode('clock'));
+  $('m-sun').addEventListener('click', () => setMode('sun'));
+
+  const box = $('chart');
+  const idxFrom = e => {
+    const svg = box.querySelector('svg'), r = svg.getBoundingClientRect(), m = dims.m;
+    const sx = (e.clientX - r.left) * (dims.w / r.width);
+    return Math.max(0, Math.min(Y.n - 1, Math.round((sx - m.l) / (dims.w - m.l - m.r) * (Y.n - 1))));
+  };
+  const pick = e => { if (!dims || !Y) return; hover = idxFrom(e); drawPaths(); updateRead(); };
+  box.addEventListener('pointermove', pick);
+  box.addEventListener('pointerdown', pick);
+  box.addEventListener('pointerleave', e => { if (e.pointerType === 'mouse') { hover = null; drawPaths(); updateRead(); } });
+  box.addEventListener('keydown', e => {
+    if (!Y) return;
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      e.preventDefault();
+      const base = hover == null ? todayIdx : hover, step = (e.key === 'ArrowRight' ? 1 : -1) * (e.shiftKey ? 7 : 1);
+      hover = Math.max(0, Math.min(Y.n - 1, base + step)); drawPaths(); updateRead();
+    } else if (e.key === 'Escape') { hover = null; drawPaths(); updateRead(); }
+  });
+
+  if ('ResizeObserver' in window) {
+    new ResizeObserver(() => { const w = Math.round(box.clientWidth); if (w && w !== lastW) buildChart(); }).observe(box);
+  } else {
+    window.addEventListener('resize', () => { const w = Math.round(box.clientWidth); if (w && w !== lastW) buildChart(); });
+  }
+
+  syncMode();
+  selectCity(city.id);
+  setInterval(updateNow, 10000);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) updateNow(); });
+})();
+</script>
+</body>
+</html>
